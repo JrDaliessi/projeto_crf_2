@@ -1,0 +1,19 @@
+# Build directories
+build/
+dist/
+
+# Dependency directories
+node_modules/
+
+# Test coverage directories
+coverage/
+
+# Configuration files
+# *.config.js
+# .eslintrc.js
+
+# Não excluir arquivos na pasta src
+!src/**/*.ts
+!src/**/*.tsx
+!src/**/*.js
+!src/**/*.jsx 
