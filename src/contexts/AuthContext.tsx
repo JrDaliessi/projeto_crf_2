@@ -1,27 +1,30 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { getCurrentUser, signIn, signOut } from '../services/authService';
+import { getCurrentUser, signIn, signOut, registerUser } from '../services/authService';
 import supabase from '../lib/supabaseClient';
 import { User } from '../types';
 
 // Interface para o contexto de autenticação
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean }>;
   logout: () => Promise<{ success: boolean }>;
+  register: (email: string, password: string, userData: { name: string; role?: 'ADMIN' | 'FUNCIONARIO' | 'ASSOCIADO'; phone?: string }) => Promise<{ success: boolean }>;
   isAuthenticated: boolean;
   isAdmin: () => boolean;
   isEmployee: () => boolean;
   isAssociate: () => boolean;
+  clearError: () => void;
 }
 
-// Criando o contexto
-const AuthContext = createContext<AuthContextType | null>(null);
-
+// Props para o componente de Provider
 interface AuthProviderProps {
   children: ReactNode;
 }
+
+// Criando o contexto em si
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -97,6 +100,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return { success };
   };
 
+  // Função de registro
+  const register = async (
+    email: string, 
+    password: string, 
+    userData: { 
+      name: string; 
+      role?: 'ADMIN' | 'FUNCIONARIO' | 'ASSOCIADO'; 
+      phone?: string 
+    }
+  ): Promise<{ success: boolean }> => {
+    setIsLoading(true);
+    setError(null);
+    
+    const { success, error } = await registerUser(email, password, userData);
+    
+    if (!success) {
+      setError(error || 'Erro ao registrar usuário');
+    }
+    
+    setIsLoading(false);
+    return { success };
+  };
+
+  // Limpar erros
+  const clearError = () => {
+    setError(null);
+  };
+
   // Verificar se o usuário tem determinado perfil
   const hasRole = (roleName: string): boolean => {
     if (!user || !user.roles) return false;
@@ -113,10 +144,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     error,
     login,
     logout,
+    register,
     isAuthenticated: !!user,
     isAdmin,
     isEmployee,
     isAssociate,
+    clearError,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
