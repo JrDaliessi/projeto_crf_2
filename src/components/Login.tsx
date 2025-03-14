@@ -26,7 +26,7 @@ const Login: React.FC = () => {
       const { success } = await login(email, password);
       
       if (success) {
-        navigate('/');
+        navigate('/home');
       } else {
         setError('Credenciais inválidas. Por favor, tente novamente.');
       }

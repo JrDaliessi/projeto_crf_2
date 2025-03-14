@@ -2,11 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-// Importar estilos globais
-import './styles/global.css';
+// Importar estilos de teste em vez dos estilos globais com Tailwind
+import './styles/test.css';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-); 
+const rootElement = document.getElementById('root');
+
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(<App />);
+} else {
+  console.error('Elemento root não encontrado no DOM');
+} 
