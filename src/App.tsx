@@ -10,6 +10,9 @@ import SimpleStyleDemo from './pages/SimpleStyleDemo';
 import Login from './pages/Login';
 import AcessoNegado from './pages/AcessoNegado';
 import Admin from './pages/Admin';
+import Home from './pages/Home';
+import VirtualListDemo from './pages/VirtualListDemo';
+import Dashboard from './pages/Dashboard';
 
 // Componentes
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -22,10 +25,11 @@ const App: React.FC = () => {
           {/* Rotas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/acesso-negado" element={<AcessoNegado />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/virtual-lists" element={<VirtualListDemo />} />
           
           {/* Rotas protegidas para qualquer usuário autenticado */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<TestPage />} />
             <Route path="/test" element={<TestPage />} />
             <Route path="/style-demo" element={<StyleDemo />} />
             <Route path="/simple-demo" element={<SimpleStyleDemo />} />
@@ -37,10 +41,11 @@ const App: React.FC = () => {
             <Route path="/admin/*" element={<Admin />} />
           </Route>
           
-          {/* Rotas protegidas para Funcionários */}
+          {/* Rotas protegidas para Funcionários e Administradores */}
           <Route element={<ProtectedRoute allowedRoles={['FUNCIONARIO', 'ADMIN']} />}>
             <Route path="/bar/*" element={<div>Módulo do Bar</div>} />
             <Route path="/portaria/*" element={<div>Módulo da Portaria</div>} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
           
           {/* Rotas protegidas para Associados */}

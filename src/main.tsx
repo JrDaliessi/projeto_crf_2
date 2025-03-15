@@ -10,6 +10,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { UserProvider } from './contexts/UserContext';
 import { ReservationProvider } from './contexts/ReservationContext';
 import { BarProvider } from './contexts/BarContext';
+import { ReportProvider } from './contexts/ReportContext';
 
 const rootElement = document.getElementById('root');
 
@@ -20,7 +21,9 @@ if (rootElement) {
         <UserProvider>
           <ReservationProvider>
             <BarProvider>
-              <App />
+              <ReportProvider>
+                <App />
+              </ReportProvider>
             </BarProvider>
           </ReservationProvider>
         </UserProvider>

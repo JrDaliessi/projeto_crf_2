@@ -3,6 +3,7 @@ export { AuthProvider, useAuth } from './AuthContext';
 export { UserProvider, useUser } from './UserContext';
 export { ReservationProvider, useReservation } from './ReservationContext';
 export { BarProvider, useBar } from './BarContext';
+export { ReportProvider, useReportData } from './ReportContext';
 
 // Exportar tipos
 export type { AuthContextType } from './AuthContext';
