@@ -1,8 +1,8 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
-type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'link';
-type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark' | 'outline' | 'text';
+type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -11,294 +11,290 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  iconOnly?: boolean;
   rounded?: boolean;
 }
 
-const getVariantStyles = (variant: ButtonVariant) => {
+const getVariantColor = (variant: ButtonVariant) => {
   switch (variant) {
-    case 'primary':
-      return css`
-        background-color: ${({ theme }) => theme.colors.primary};
-        color: white;
-        &:hover:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.blue[600]};
-          transform: translateY(-1px);
-        }
-        &:active:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.blue[700]};
-          transform: translateY(0);
-        }
-        &:focus-visible {
-          box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.blue[200]};
-        }
-      `;
-    case 'secondary':
-      return css`
-        background-color: ${({ theme }) => theme.colors.secondary};
-        color: white;
-        &:hover:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.green[600]};
-          transform: translateY(-1px);
-        }
-        &:active:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.green[700]};
-          transform: translateY(0);
-        }
-        &:focus-visible {
-          box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.green[200]};
-        }
-      `;
-    case 'accent':
-      return css`
-        background-color: ${({ theme }) => theme.colors.accent};
-        color: white;
-        &:hover:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.red[600]};
-          transform: translateY(-1px);
-        }
-        &:active:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.red[700]};
-          transform: translateY(0);
-        }
-        &:focus-visible {
-          box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.red[200]};
-        }
-      `;
-    case 'outline':
-      return css`
-        background-color: transparent;
-        color: ${({ theme }) => theme.colors.text};
-        border: 1px solid ${({ theme }) => theme.colors.border};
-        &:hover:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.gray[100]};
-          border-color: ${({ theme }) => theme.colors.gray[400]};
-        }
-        &:active:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.gray[200]};
-        }
-        &:focus-visible {
-          box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.gray[200]};
-        }
-      `;
-    case 'ghost':
-      return css`
-        background-color: transparent;
-        color: ${({ theme }) => theme.colors.text};
-        &:hover:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.gray[100]};
-        }
-        &:active:not(:disabled) {
-          background-color: ${({ theme }) => theme.colors.gray[200]};
-        }
-        &:focus-visible {
-          box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.gray[200]};
-        }
-      `;
-    case 'link':
-      return css`
-        background-color: transparent;
-        color: ${({ theme }) => theme.colors.primary};
-        padding: 0;
-        height: auto;
-        font-weight: ${({ theme }) => theme.fontWeights.medium};
-        &:hover:not(:disabled) {
-          text-decoration: underline;
-        }
-        &:focus-visible {
-          box-shadow: none;
-          text-decoration: underline;
-        }
-      `;
-    default:
-      return '';
+    case 'primary': return 'var(--color-primary)';
+    case 'secondary': return 'var(--color-secondary)';
+    case 'success': return 'var(--color-success)';
+    case 'danger': return 'var(--color-error)';
+    case 'warning': return 'var(--color-warning)';
+    case 'info': return 'var(--color-info)';
+    case 'light': return '#f8f9fa';
+    case 'dark': return '#212529';
+    case 'outline': 
+    case 'text': 
+    default: return 'var(--color-primary)';
   }
 };
 
-const getSizeStyles = (size: ButtonSize) => {
-  switch (size) {
-    case 'xs':
-      return css`
-        height: 1.5rem;
-        padding: ${({ theme }) => `${theme.spacing[1]} ${theme.spacing[2]}`};
-        font-size: ${({ theme }) => theme.fontSizes.xs};
-        
-        .left-icon, .right-icon {
-          width: 0.75rem;
-          height: 0.75rem;
-        }
-      `;
-    case 'sm':
-      return css`
-        height: 2rem;
-        padding: ${({ theme }) => `${theme.spacing[1]} ${theme.spacing[3]}`};
-        font-size: ${({ theme }) => theme.fontSizes.sm};
-        
-        .left-icon, .right-icon {
-          width: 0.875rem;
-          height: 0.875rem;
-        }
-      `;
-    case 'lg':
-      return css`
-        height: 3rem;
-        padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[5]}`};
-        font-size: ${({ theme }) => theme.fontSizes.lg};
-        
-        .left-icon, .right-icon {
-          width: 1.25rem;
-          height: 1.25rem;
-        }
-      `;
-    case 'xl':
-      return css`
-        height: 3.5rem;
-        padding: ${({ theme }) => `${theme.spacing[3]} ${theme.spacing[6]}`};
-        font-size: ${({ theme }) => theme.fontSizes.xl};
-        
-        .left-icon, .right-icon {
-          width: 1.5rem;
-          height: 1.5rem;
-        }
-      `;
-    case 'md':
-    default:
-      return css`
-        height: 2.5rem;
-        padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[4]}`};
-        font-size: ${({ theme }) => theme.fontSizes.base};
-        
-        .left-icon, .right-icon {
-          width: 1rem;
-          height: 1rem;
-        }
-      `;
+const getHoverColor = (variant: ButtonVariant) => {
+  switch (variant) {
+    case 'primary': return '#2563eb';
+    case 'secondary': return '#059669';
+    case 'success': return '#059669';
+    case 'danger': return '#dc2626';
+    case 'warning': return '#d97706';
+    case 'info': return '#2563eb';
+    case 'light': return '#e9ecef';
+    case 'dark': return '#343a40';
+    case 'outline': 
+    case 'text': 
+    default: return 'rgba(59, 130, 246, 0.1)';
   }
 };
+
+const getVariantStyles = (variant: ButtonVariant) => {
+  const baseColor = getVariantColor(variant);
+  const hoverColor = getHoverColor(variant);
+  
+  if (variant === 'outline') {
+    return css`
+      background-color: transparent;
+      color: ${baseColor};
+      border: 1px solid ${baseColor};
+      
+      &:hover:not(:disabled):not(.disabled) {
+        background-color: ${hoverColor};
+        color: ${['light', 'warning'].includes(variant) ? '#212529' : 'white'};
+      }
+    `;
+  }
+  
+  if (variant === 'text') {
+    return css`
+      background-color: transparent;
+      color: ${baseColor};
+      border: none;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      
+      &:hover:not(:disabled):not(.disabled) {
+        background-color: ${hoverColor};
+      }
+    `;
+  }
+  
+  return css`
+    background-color: ${baseColor};
+    color: ${['light', 'warning'].includes(variant) ? '#212529' : 'white'};
+    border: 1px solid ${baseColor};
+    
+    &:hover:not(:disabled):not(.disabled) {
+      background-color: ${hoverColor};
+      border-color: ${hoverColor};
+    }
+  `;
+};
+
+const getSizeStyles = (size: ButtonSize, iconOnly: boolean = false) => {
+  if (iconOnly) {
+    switch (size) {
+      case 'xs': return css`
+        height: 1.5rem;
+        width: 1.5rem;
+        padding: 0;
+        font-size: 0.75rem;
+      `;
+      case 'sm': return css`
+        height: 2rem;
+        width: 2rem;
+        padding: 0;
+        font-size: 0.875rem;
+      `;
+      case 'lg': return css`
+        height: 3rem;
+        width: 3rem;
+        padding: 0;
+        font-size: 1.25rem;
+      `;
+      case 'md':
+      default: return css`
+        height: 2.5rem;
+        width: 2.5rem;
+        padding: 0;
+        font-size: 1rem;
+      `;
+    }
+  }
+  
+  switch (size) {
+    case 'xs': return css`
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      height: 1.5rem;
+    `;
+    case 'sm': return css`
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+      height: 2rem;
+    `;
+    case 'lg': return css`
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+      height: 3rem;
+    `;
+    case 'md':
+    default: return css`
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      height: 2.5rem;
+    `;
+  }
+};
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const ripple = keyframes`
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+`;
 
 const StyledButton = styled.button<ButtonProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: ${({ theme, rounded }) => rounded ? theme.borderRadius.full : theme.borderRadius.DEFAULT};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: ${props => props.rounded ? '9999px' : '0.375rem'};
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
   cursor: pointer;
-  border: none;
   outline: none;
   position: relative;
   overflow: hidden;
-  
-  ${({ variant = 'primary' }) => getVariantStyles(variant)}
-  ${({ size = 'md' }) => getSizeStyles(size)}
-  ${({ fullWidth }) => fullWidth && css`width: 100%;`}
-  
-  &:disabled {
-    opacity: 0.6;
+  line-height: 1;
+  white-space: nowrap;
+  width: ${props => props.fullWidth ? '100%' : 'auto'};
+  text-decoration: none;
+
+  ${props => getVariantStyles(props.variant || 'primary')}
+  ${props => getSizeStyles(props.size || 'md', props.iconOnly)}
+
+  &:disabled, &.disabled {
+    opacity: 0.65;
     cursor: not-allowed;
     pointer-events: none;
   }
-  
-  &:after {
-    content: '';
-    display: block;
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  }
+
+  .ripple {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
-    background-repeat: no-repeat;
-    background-position: 50%;
-    transform: scale(10, 10);
-    opacity: 0;
-    transition: transform 0.3s, opacity 0.5s;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ${ripple} 0.6s linear;
+    background-color: rgba(255, 255, 255, 0.7);
   }
-  
-  &:active:after {
-    transform: scale(0, 0);
-    opacity: 0.3;
-    transition: 0s;
+
+  svg {
+    width: ${props => {
+      switch (props.size) {
+        case 'xs': return '0.75rem';
+        case 'sm': return '0.875rem';
+        case 'lg': return '1.25rem';
+        case 'md':
+        default: return '1rem';
+      }
+    }};
+    height: ${props => {
+      switch (props.size) {
+        case 'xs': return '0.75rem';
+        case 'sm': return '0.875rem';
+        case 'lg': return '1.25rem';
+        case 'md':
+        default: return '1rem';
+      }
+    }};
   }
-  
-  .left-icon {
-    margin-right: ${({ theme }) => theme.spacing[2]};
-    display: inline-flex;
-  }
-  
-  .right-icon {
-    margin-left: ${({ theme }) => theme.spacing[2]};
-    display: inline-flex;
-  }
-  
-  .loading-spinner {
-    margin-right: ${({ theme, children }) => children ? theme.spacing[2] : 0};
-    animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
+
+  ${props => !props.iconOnly && props.leftIcon && css`
+    svg:first-child {
+      margin-right: 0.5rem;
     }
-    to {
-      transform: rotate(360deg);
+  `}
+
+  ${props => !props.iconOnly && props.rightIcon && css`
+    svg:last-child {
+      margin-left: 0.5rem;
     }
-  }
+  `}
 `;
 
-const LoadingSpinner = () => (
-  <svg 
-    className="loading-spinner" 
-    width="16" 
-    height="16" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <circle 
-      cx="12" 
-      cy="12" 
-      r="10" 
-      stroke="currentColor" 
-      strokeWidth="4" 
-      strokeDasharray="30 30" 
-      strokeDashoffset="0" 
-    />
-    <path 
-      d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      opacity="0.3"
-    />
-  </svg>
-);
+const Spinner = styled.span`
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 0.15em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ${spin} 0.75s linear infinite;
+  margin-right: 0.5rem;
+  opacity: 0.7;
+`;
 
-const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
+const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'primary',
+  size = 'md',
   fullWidth = false,
   isLoading = false,
   leftIcon,
   rightIcon,
-  disabled,
+  iconOnly = false,
   rounded = false,
-  ...props 
+  disabled,
+  onClick,
+  ...rest
 }) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (onClick && !isLoading && !disabled) {
+      // Adicionar efeito de ripple
+      const button = e.currentTarget;
+      const circle = document.createElement('span');
+      const diameter = Math.max(button.clientWidth, button.clientHeight);
+      const radius = diameter / 2;
+
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${e.clientX - button.getBoundingClientRect().left - radius}px`;
+      circle.style.top = `${e.clientY - button.getBoundingClientRect().top - radius}px`;
+      circle.classList.add('ripple');
+
+      const ripple = button.getElementsByClassName('ripple')[0];
+      if (ripple) {
+        ripple.remove();
+      }
+
+      button.appendChild(circle);
+      onClick(e);
+    }
+  };
+
   return (
-    <StyledButton 
-      variant={variant} 
-      size={size} 
+    <StyledButton
+      variant={variant}
+      size={size}
       fullWidth={fullWidth}
       disabled={disabled || isLoading}
+      leftIcon={leftIcon}
+      rightIcon={rightIcon}
+      iconOnly={iconOnly}
       rounded={rounded}
-      {...props}
+      onClick={handleClick}
+      {...rest}
     >
-      {isLoading && <LoadingSpinner />}
-      {!isLoading && leftIcon && <span className="left-icon">{leftIcon}</span>}
-      {children}
-      {!isLoading && rightIcon && <span className="right-icon">{rightIcon}</span>}
+      {isLoading && <Spinner />}
+      {!isLoading && leftIcon && leftIcon}
+      {!iconOnly && children}
+      {!isLoading && rightIcon && rightIcon}
     </StyledButton>
   );
 };

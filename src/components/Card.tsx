@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-type CardVariant = 'default' | 'outlined' | 'elevated' | 'filled' | 'subtle';
+type CardVariant = 'default' | 'outlined' | 'elevated' | 'filled' | 'accent';
 
 interface CardProps {
   variant?: CardVariant;
@@ -10,63 +10,55 @@ interface CardProps {
   onClick?: () => void;
   className?: string;
   fullWidth?: boolean;
-  hoverEffect?: boolean;
-  borderAccent?: boolean;
+  title?: string;
+  subtitle?: string;
+  action?: React.ReactNode;
 }
 
 const getVariantStyles = (variant: CardVariant) => {
   switch (variant) {
     case 'outlined':
       return css`
-        border: 1px solid ${({ theme }) => theme.colors.border};
-        background-color: ${({ theme }) => theme.colors.backgroundAlt};
+        border: 1px solid var(--color-border);
+        background-color: white;
       `;
     case 'elevated':
       return css`
-        box-shadow: ${({ theme }) => theme.shadows.md};
-        background-color: ${({ theme }) => theme.colors.backgroundAlt};
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        background-color: white;
       `;
     case 'filled':
       return css`
-        background-color: ${({ theme }) => theme.colors.gray[100]};
+        background-color: var(--color-background);
       `;
-    case 'subtle':
+    case 'accent':
       return css`
-        background-color: ${({ theme }) => theme.colors.gray[50]};
-        border: 1px solid ${({ theme }) => theme.colors.gray[100]};
+        border-left: 4px solid var(--color-primary);
+        background-color: white;
       `;
     case 'default':
     default:
       return css`
-        background-color: ${({ theme }) => theme.colors.backgroundAlt};
-        box-shadow: ${({ theme }) => theme.shadows.sm};
+        background-color: white;
+        border: 1px solid var(--color-border);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       `;
   }
 };
 
-const StyledCard = styled.div<Omit<CardProps, 'children'>>`
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  padding: ${({ padding, theme }) => padding || theme.spacing[6]};
-  transition: all ${({ theme }) => theme.transitions.default};
+const StyledCard = styled.div<Omit<CardProps, 'children' | 'title' | 'subtitle' | 'action'>>`
+  border-radius: 0.5rem;
+  padding: ${({ padding }) => padding || '1.5rem'};
+  transition: all 0.2s ease;
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
-  position: relative;
-  overflow: hidden;
-  
   ${({ variant = 'default' }) => getVariantStyles(variant)}
-  
-  ${({ borderAccent }) =>
-    borderAccent &&
+  ${({ onClick }) =>
+    onClick &&
     css`
-      border-top: 3px solid ${({ theme }) => theme.colors.primary};
-    `}
-  
-  ${({ hoverEffect, onClick }) =>
-    (hoverEffect || onClick) &&
-    css`
-      cursor: ${onClick ? 'pointer' : 'default'};
+      cursor: pointer;
       &:hover {
         transform: translateY(-3px);
-        box-shadow: ${({ theme }) => theme.shadows.lg};
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       }
       &:active {
         transform: translateY(-1px);
@@ -74,100 +66,113 @@ const StyledCard = styled.div<Omit<CardProps, 'children'>>`
     `}
 `;
 
-const CardHeader = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
+const InternalCardHeader = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 `;
 
-const CardTitle = styled.h3`
-  font-size: ${({ theme }) => theme.fontSizes.xl};
-  font-weight: ${({ theme }) => theme.fontWeights.semibold};
-  color: ${({ theme }) => theme.colors.text};
+const CardTitleBlock = styled.div`
+  flex: 1;
+`;
+
+const CardTitleText = styled.h3`
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
   margin: 0;
-  margin-bottom: ${({ theme }) => theme.spacing[1]};
-  line-height: 1.2;
+  margin-bottom: 0.25rem;
 `;
 
-const CardSubtitle = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.textLight};
+const CardSubtitleText = styled.p`
+  font-size: 0.875rem;
+  color: var(--color-text-light);
   margin: 0;
-  line-height: 1.5;
 `;
 
-const CardBody = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing[3]};
-  color: ${({ theme }) => theme.colors.text};
+const CardActionArea = styled.div`
+  margin-left: 1rem;
 `;
 
-const CardFooter = styled.div`
+const CardContent = styled.div``;
+
+const InternalCardFooter = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-top: ${({ theme }) => theme.spacing[4]};
-  padding-top: ${({ theme }) => theme.spacing[3]};
-  border-top: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
 `;
 
-const CardDivider = styled.hr`
-  border: 0;
-  height: 1px;
-  background-color: ${({ theme }) => theme.colors.gray[200]};
-  margin: ${({ theme }) => `${theme.spacing[4]} 0`};
+// Componentes exportados para uso composicional
+export const CardHeader = styled.div`
+  margin-bottom: 1rem;
 `;
 
-const CardImage = styled.div<{ src?: string }>`
-  width: calc(100% + ${({ theme }) => theme.spacing[12]});
-  margin: -${({ theme }) => theme.spacing[6]};
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
-  height: 200px;
-  background-image: ${({ src }) => (src ? `url(${src})` : 'none')};
-  background-size: cover;
-  background-position: center;
-  border-top-left-radius: ${({ theme }) => theme.borderRadius.lg};
-  border-top-right-radius: ${({ theme }) => theme.borderRadius.lg};
+export const CardTitle = styled.h3`
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  margin-bottom: 0.25rem;
 `;
 
-const Card: React.FC<CardProps> & {
-  Header: typeof CardHeader;
-  Title: typeof CardTitle;
-  Subtitle: typeof CardSubtitle;
-  Body: typeof CardBody;
-  Footer: typeof CardFooter;
-  Divider: typeof CardDivider;
-  Image: typeof CardImage;
-} = ({ 
+export const CardSubtitle = styled.p`
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  margin: 0;
+`;
+
+export const CardBody = styled.div``;
+
+export const CardFooter = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+`;
+
+const Card: React.FC<CardProps> = ({ 
   children, 
   variant = 'default', 
   padding, 
   onClick, 
-  className,
+  className, 
   fullWidth = false,
-  hoverEffect = false,
-  borderAccent = false,
+  title,
+  subtitle,
+  action,
 }) => {
+  const hasHeader = title || subtitle || action;
+
   return (
     <StyledCard 
       variant={variant} 
-      padding={padding} 
+      padding={hasHeader || padding ? padding : undefined}
       onClick={onClick}
       className={className}
       fullWidth={fullWidth}
-      hoverEffect={hoverEffect}
-      borderAccent={borderAccent}
     >
-      {children}
+      {hasHeader && (
+        <InternalCardHeader>
+          <CardTitleBlock>
+            {title && <CardTitleText>{title}</CardTitleText>}
+            {subtitle && <CardSubtitleText>{subtitle}</CardSubtitleText>}
+          </CardTitleBlock>
+          {action && <CardActionArea>{action}</CardActionArea>}
+        </InternalCardHeader>
+      )}
+      <CardContent>
+        {children}
+      </CardContent>
     </StyledCard>
   );
 };
 
-Card.Header = CardHeader;
-Card.Title = CardTitle;
-Card.Subtitle = CardSubtitle;
-Card.Body = CardBody;
-Card.Footer = CardFooter;
-Card.Divider = CardDivider;
-Card.Image = CardImage;
+Card.displayName = 'Card';
 
 export default Card; 

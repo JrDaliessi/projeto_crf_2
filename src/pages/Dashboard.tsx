@@ -1,143 +1,318 @@
-import React from 'react';
-import { 
-  BarChart, 
-  LineChart, 
-  PieChart, 
-  DoughnutChart 
-} from '../components/charts';
-import { useReportData } from '../contexts/ReportContext';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { FiUsers, FiCalendar, FiCreditCard, FiTrendingUp, FiBarChart2, FiRefreshCw } from 'react-icons/fi';
+import Layout from '../components/Layout';
+import Card from '../components/Card';
+import Button from '../components/Button';
 import { useAuth } from '../contexts/AuthContext';
 
-const Dashboard: React.FC = () => {
-  const { 
-    monthlySales, 
-    expenseCategories, 
-    weeklyAccess, 
-    reservationsByArea,
-    totalUsers,
-    activeUsers,
-    totalRevenue,
-    pendingPayments,
-    isLoadingStats
-  } = useReportData();
+// Componentes estilizados
+const DashboardGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
   
-  const { user } = useAuth();
-  
-  // Função para formatar valores monetários
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-  
-  // Cards de estatísticas
-  const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon?: React.ReactNode }) => (
-    <div className="bg-white rounded-lg shadow-md p-4">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-gray-500 text-sm">{title}</h3>
-          <p className="text-xl font-bold">{value}</p>
-        </div>
-        {icon && <div className="text-blue-500 text-2xl">{icon}</div>}
-      </div>
-    </div>
-  );
-  
-  if (!user || !(user.roles.role_name === 'ADMIN' || user.roles.role_name === 'FUNCIONARIO')) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-red-500 mb-4">Acesso Negado</h1>
-          <p>Você não tem permissão para acessar esta página.</p>
-        </div>
-      </div>
-    );
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
   }
   
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
+
+const StatsCard = styled(Card)`
+  height: 100%;
+`;
+
+const StatsHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+const IconContainer = styled.div<{ color: string }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background-color: ${props => `rgba(var(--${props.color}-rgb), 0.1)`};
+  color: ${props => `var(--color-${props.color})`};
+  margin-right: 1rem;
+`;
+
+const StatsValueContainer = styled.div`
+  flex: 1;
+`;
+
+const StatsTitle = styled.h3`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-light);
+  margin: 0;
+`;
+
+const StatsValue = styled.div`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+`;
+
+const StatsChange = styled.div<{ positive: boolean }>`
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: ${props => props.positive ? 'var(--color-success)' : 'var(--color-error)'};
+  margin-top: 0.25rem;
+  
+  svg {
+    margin-right: 0.25rem;
+  }
+`;
+
+const ChartsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: 2fr 1fr;
+  }
+`;
+
+const ChartCard = styled(Card)`
+  min-height: 300px;
+`;
+
+const ChartPlaceholder = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 230px;
+  background-color: var(--color-background);
+  border-radius: 0.5rem;
+  color: var(--color-text-light);
+  border: 1px dashed var(--color-border);
+`;
+
+const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
+const CardTitle = styled.h2`
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+`;
+
+const LastUpdate = styled.div`
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  margin-top: 0.5rem;
+`;
+
+const ActivityListContainer = styled.div`
+  margin-top: 1rem;
+`;
+
+const ActivityItem = styled.div`
+  display: flex;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const ActivityIcon = styled.div<{ bg: string }>`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: ${props => props.bg};
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+`;
+
+const ActivityContent = styled.div`
+  flex: 1;
+`;
+
+const ActivityTitle = styled.div`
+  font-weight: 500;
+  color: var(--color-text);
+`;
+
+const ActivityTime = styled.div`
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  margin-top: 0.25rem;
+`;
+
+const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Dados simulados para o dashboard
+  const statsData = [
+    { 
+      id: 1, 
+      title: 'Usuários Ativos', 
+      value: '245', 
+      change: '+12.5%', 
+      positive: true, 
+      icon: <FiUsers size={20} />,
+      color: 'primary'
+    },
+    { 
+      id: 2, 
+      title: 'Reservas Hoje', 
+      value: '15', 
+      change: '+5.2%', 
+      positive: true, 
+      icon: <FiCalendar size={20} />,
+      color: 'secondary'
+    },
+    { 
+      id: 3, 
+      title: 'Transações', 
+      value: 'R$ 8.540', 
+      change: '-2.3%', 
+      positive: false, 
+      icon: <FiCreditCard size={20} />,
+      color: 'warning'
+    },
+    { 
+      id: 4, 
+      title: 'Crescimento', 
+      value: '12.5%', 
+      change: '+8.4%', 
+      positive: true, 
+      icon: <FiTrendingUp size={20} />,
+      color: 'success'
+    }
+  ];
+  
+  const recentActivities = [
+    {
+      id: 1,
+      title: 'João Silva fez uma reserva no Salão de Festas',
+      time: 'Há 35 minutos',
+      icon: <FiCalendar size={16} />,
+      bg: 'var(--color-primary)'
+    },
+    {
+      id: 2,
+      title: 'Maria Santos registrou entrada na portaria',
+      time: 'Há 1 hora',
+      icon: <FiUsers size={16} />,
+      bg: 'var(--color-success)'
+    },
+    {
+      id: 3,
+      title: 'Pedro Oliveira fez um pagamento de R$ 150,00',
+      time: 'Há 2 horas',
+      icon: <FiCreditCard size={16} />,
+      bg: 'var(--color-warning)'
+    },
+    {
+      id: 4,
+      title: 'Ana Pereira atualizou seus dados cadastrais',
+      time: 'Há 4 horas',
+      icon: <FiUsers size={16} />,
+      bg: 'var(--color-info)'
+    }
+  ];
+  
+  const refreshData = () => {
+    setIsLoading(true);
+    // Simular carregamento de dados
+    setTimeout(() => {
+      setLastUpdate(new Date());
+      setIsLoading(false);
+    }, 1000);
+  };
+  
+  useEffect(() => {
+    refreshData();
+  }, []);
+  
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+    <Layout>
+      <CardHeader>
+        <div>
+          <CardTitle>Visão Geral</CardTitle>
+          <LastUpdate>
+            Última atualização: {lastUpdate.toLocaleString()}
+          </LastUpdate>
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          leftIcon={<FiRefreshCw />}
+          onClick={refreshData}
+          isLoading={isLoading}
+        >
+          Atualizar
+        </Button>
+      </CardHeader>
       
-      {/* Estatísticas Gerais */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard 
-          title="Usuários Cadastrados" 
-          value={isLoadingStats ? 'Carregando...' : totalUsers.toString()} 
-        />
-        <StatCard 
-          title="Usuários Ativos (30 dias)" 
-          value={isLoadingStats ? 'Carregando...' : activeUsers.toString()} 
-        />
-        <StatCard 
-          title="Receita (30 dias)" 
-          value={isLoadingStats ? 'Carregando...' : formatCurrency(totalRevenue)} 
-        />
-        <StatCard 
-          title="Pagamentos Pendentes" 
-          value={isLoadingStats ? 'Carregando...' : formatCurrency(pendingPayments)} 
-        />
-      </div>
+      <DashboardGrid>
+        {statsData.map(stat => (
+          <StatsCard key={stat.id}>
+            <StatsHeader>
+              <IconContainer color={stat.color}>
+                {stat.icon}
+              </IconContainer>
+              <StatsValueContainer>
+                <StatsTitle>{stat.title}</StatsTitle>
+                <StatsValue>{stat.value}</StatsValue>
+                <StatsChange positive={stat.positive}>
+                  {stat.positive ? <FiTrendingUp size={14} /> : <FiTrendingUp size={14} style={{ transform: 'rotate(180deg)' }} />}
+                  {stat.change}
+                </StatsChange>
+              </StatsValueContainer>
+            </StatsHeader>
+          </StatsCard>
+        ))}
+      </DashboardGrid>
       
-      {/* Gráficos em grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Vendas Mensais */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Vendas Mensais</h2>
-          <div className="h-64">
-            {monthlySales.loading ? (
-              <div className="h-full flex items-center justify-center">
-                <p>Carregando dados...</p>
-              </div>
-            ) : (
-              <BarChart data={monthlySales.data} height={250} />
-            )}
-          </div>
-        </div>
+      <ChartsGrid>
+        <ChartCard title="Análise de Atividade" subtitle="Últimos 30 dias">
+          <ChartPlaceholder>
+            <FiBarChart2 size={48} />
+          </ChartPlaceholder>
+        </ChartCard>
         
-        {/* Categorias de Despesas */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Despesas por Categoria</h2>
-          <div className="h-64">
-            {expenseCategories.loading ? (
-              <div className="h-full flex items-center justify-center">
-                <p>Carregando dados...</p>
-              </div>
-            ) : (
-              <PieChart data={expenseCategories.data} height={250} />
-            )}
-          </div>
-        </div>
-        
-        {/* Acessos Semanais */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Acessos por Dia da Semana</h2>
-          <div className="h-64">
-            {weeklyAccess.loading ? (
-              <div className="h-full flex items-center justify-center">
-                <p>Carregando dados...</p>
-              </div>
-            ) : (
-              <LineChart data={weeklyAccess.data} height={250} />
-            )}
-          </div>
-        </div>
-        
-        {/* Reservas por Área */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Reservas por Área</h2>
-          <div className="h-64">
-            {reservationsByArea.loading ? (
-              <div className="h-full flex items-center justify-center">
-                <p>Carregando dados...</p>
-              </div>
-            ) : (
-              <DoughnutChart data={reservationsByArea.data} height={250} />
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+        <Card title="Atividades Recentes">
+          <ActivityListContainer>
+            {recentActivities.map(activity => (
+              <ActivityItem key={activity.id}>
+                <ActivityIcon bg={activity.bg}>
+                  {activity.icon}
+                </ActivityIcon>
+                <ActivityContent>
+                  <ActivityTitle>{activity.title}</ActivityTitle>
+                  <ActivityTime>{activity.time}</ActivityTime>
+                </ActivityContent>
+              </ActivityItem>
+            ))}
+          </ActivityListContainer>
+        </Card>
+      </ChartsGrid>
+    </Layout>
   );
 };
 
