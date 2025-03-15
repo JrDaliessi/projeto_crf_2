@@ -17,8 +17,9 @@ import ExemploOffline from './pages/ExemploOffline';
 
 // Componentes
 import { ProtectedRoute } from './components/ProtectedRoute';
-import OfflineIndicator from './components/OfflineIndicator';
-import UpdatePrompt from './components/UpdatePrompt';
+// Componentes PWA temporariamente desativados
+// import OfflineIndicator from './components/OfflineIndicator';
+// import UpdatePrompt from './components/UpdatePrompt';
 
 // Registrar o service worker (apenas na produção)
 const registerServiceWorker = () => {
@@ -30,17 +31,16 @@ const registerServiceWorker = () => {
   }
 };
 
-registerServiceWorker();
+// Temporariamente desativado
+// registerServiceWorker();
 
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={defaultTheme}>
       <BrowserRouter>
-        {/* Componente de indicação offline que aparece em todas as páginas quando necessário */}
-        <OfflineIndicator />
-        
-        {/* Componente que notifica sobre atualizações disponíveis */}
-        <UpdatePrompt />
+        {/* Componentes PWA desativados temporariamente */}
+        {/* <OfflineIndicator /> */}
+        {/* <UpdatePrompt /> */}
         
         <Routes>
           {/* Rotas públicas */}

@@ -4,6 +4,8 @@ import App from './App';
 
 // Importar estilos de teste em vez dos estilos globais com Tailwind
 import './styles/test.css';
+// Importar TailwindCSS
+import './index.css';
 
 // Importar contextos
 import { AuthProvider } from './contexts/AuthContext';
