@@ -1,0 +1,13 @@
+{
+  "name": "supabase-scripts",
+  "version": "1.0.0",
+  "description": "Scripts para gerenciar usuários no Supabase",
+  "type": "module",
+  "scripts": {
+    "add-users": "node add-test-users.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "dotenv": "^16.3.1"
+  }
+} 
