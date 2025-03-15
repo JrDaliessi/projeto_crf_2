@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { ThemeProvider } from 'styled-components';
+import { defaultTheme } from './theme';
 
-// Importar estilos de teste em vez dos estilos globais com Tailwind
-import './styles/test.css';
-// Importar TailwindCSS
+// Importar estilos CSS
 import './index.css';
+import './styles/global.css';
 
 // Importar contextos
 import { AuthProvider } from './contexts/AuthContext';
@@ -19,17 +20,19 @@ const rootElement = document.getElementById('root');
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <AuthProvider>
-        <UserProvider>
-          <ReservationProvider>
-            <BarProvider>
-              <ReportProvider>
-                <App />
-              </ReportProvider>
-            </BarProvider>
-          </ReservationProvider>
-        </UserProvider>
-      </AuthProvider>
+      <ThemeProvider theme={defaultTheme}>
+        <AuthProvider>
+          <UserProvider>
+            <ReservationProvider>
+              <BarProvider>
+                <ReportProvider>
+                  <App />
+                </ReportProvider>
+              </BarProvider>
+            </ReservationProvider>
+          </UserProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </React.StrictMode>
   );
 } else {
