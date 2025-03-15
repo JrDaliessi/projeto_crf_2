@@ -1,53 +1,90 @@
-# Clube App - Conexão com Supabase
+# CRF Clube App
 
-Este projeto implementa a integração com o Supabase para gerenciar o banco de dados do sistema de gerenciamento do clube.
+Sistema de gerenciamento para clube com funcionalidades de controle de acesso, pagamentos e reservas de espaços.
 
-## Pré-requisitos
+## Requisitos de Sistema
 
-- Node.js (versão 14+)
+- Node.js (versão 16+)
 - NPM ou Yarn
-- Um projeto criado no Supabase (https://supabase.com)
 
-## Configuração do Projeto
+## Instalação
 
-### 1. Instalar Dependências
+1. Clone o repositório
+```bash
+git clone [url-do-repositorio]
+cd projeto_crf_2
+```
 
+2. Instale as dependências
 ```bash
 npm install
 # ou
 yarn
 ```
 
-### 2. Configurar Variáveis de Ambiente
+3. Configuração do Supabase
 
-Renomeie o arquivo `.env.local` para `.env` e preencha com suas credenciais do Supabase:
+Este projeto utiliza o Supabase como banco de dados e autenticação. Você precisará:
+- Criar uma conta no [Supabase](https://supabase.com)
+- Criar um novo projeto
+- Configurar as tabelas necessárias (veja documentação em `/docs/database.md`)
 
-```
-NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anon-public
-```
-
-Para obter estas credenciais:
-1. Acesse o painel administrativo do Supabase
-2. Clique em "Project Settings" (Configurações do Projeto)
-3. Navegue até a seção "API"
-4. Copie a "URL" e a "anon key" para suas variáveis de ambiente
-
-### 3. Iniciar o Servidor de Desenvolvimento
-
+4. Configure as variáveis de ambiente:
+- Copie o arquivo `.env.example` para `.env.local`
 ```bash
-npm run dev
-# ou
-yarn dev
+cp .env.example .env.local
 ```
+- Preencha as variáveis com seus dados do Supabase:
+```
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase
+```
+
+## Scripts Disponíveis
+
+- `npm run dev`: Inicia o servidor de desenvolvimento
+- `npm run build`: Compila o projeto para produção
+- `npm run preview`: Visualiza a versão compilada localmente
+- `npm run lint`: Executa verificação de código
+- `npm run format`: Formata o código conforme padrões configurados
+
+## Deploy
+
+### Deploy na Vercel
+
+1. Conecte seu repositório GitHub na Vercel
+2. Configure as variáveis de ambiente na interface da Vercel
+3. A Vercel detectará automaticamente que é um projeto Vite e configurará o build
+
+### Deploy em outros ambientes
+
+1. Execute `npm run build` para gerar os arquivos estáticos
+2. Faça o upload do conteúdo da pasta `dist` para seu servidor web
 
 ## Estrutura do Projeto
 
-- `/src/lib/supabaseClient.js` - Cliente do Supabase para conexão com o banco de dados
-- `/src/services/` - Serviços para interagir com as tabelas do banco de dados
-- `/src/contexts/AuthContext.jsx` - Contexto de autenticação para gerenciar login/logout
-- `/src/types/` - Definições de tipos TypeScript para as tabelas
-- `/src/components/` - Componentes React, incluindo um exemplo de login
+- `/src/components/`: Componentes React reutilizáveis
+- `/src/contexts/`: Contextos React para gerenciamento de estado global
+- `/src/hooks/`: Hooks personalizados
+- `/src/lib/`: Utilitários e configurações (inclui conexão Supabase)
+- `/src/pages/`: Páginas da aplicação
+- `/src/services/`: Serviços de API e lógica de negócios
+- `/src/styles/`: Estilos e temas
+- `/src/types/`: Definições de tipos TypeScript
+- `/src/utils/`: Funções utilitárias
+
+## Documentação
+
+A documentação completa está disponível na pasta `/docs`:
+
+- [Documentação de Código](/docs/code-documentation.md): Padrões e convenções
+- [Banco de Dados](/docs/database.md): Estrutura e relacionamentos
+- [Perfis de Acesso](/docs/user-roles.md): Níveis de permissão
+- [Funcionalidades](/docs/core-features.md): Principais recursos
+- [Tecnologias](/docs/technologies.md): Stack tecnológico
+- [Monitoramento](/docs/monitoring.md): Ferramentas de monitoramento
+- [Manutenção](/docs/maintenance.md): Fluxo de trabalho e boas práticas
+- [Backlog](/docs/backlog.md): Roadmap e gestão de tarefas
 
 ## Como Usar
 
@@ -90,36 +127,18 @@ const buscarProdutos = async () => {
 };
 ```
 
-### Inserção de Dados
+## Contribuição
 
-```javascript
-import supabase from '../lib/supabaseClient';
+1. Faça um fork do projeto
+2. Crie sua branch de feature (`git checkout -b feature/nome-da-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nome-da-feature`)
+5. Abra um Pull Request
 
-const criarReserva = async (reserva) => {
-  const { data, error } = await supabase
-    .from('area_reservations')
-    .insert([
-      {
-        area_id: reserva.areaId,
-        user_id: reserva.userId,
-        start_time: reserva.startTime,
-        end_time: reserva.endTime,
-        status: 'RESERVED'
-      }
-    ])
-    .select();
-    
-  if (error) {
-    console.error('Erro ao criar reserva:', error);
-    return null;
-  }
-  
-  return data[0];
-};
-```
+## Licença
 
-## Documentação Adicional
+Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para mais detalhes.
 
-- [Documentação do Supabase](https://supabase.com/docs)
-- [API do Supabase JS](https://supabase.com/docs/reference/javascript/introduction)
-- [Autenticação do Supabase](https://supabase.com/docs/guides/auth) 
+## Contato
+
+Para suporte ou dúvidas, entre em contato via email: suporte@crfclube.com.br 
