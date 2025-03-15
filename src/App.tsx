@@ -9,6 +9,7 @@ import StyleDemo from './pages/StyleDemo';
 import SimpleStyleDemo from './pages/SimpleStyleDemo';
 import Login from './pages/Login';
 import AcessoNegado from './pages/AcessoNegado';
+import Admin from './pages/Admin';
 
 // Componentes
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -32,7 +33,8 @@ const App: React.FC = () => {
           
           {/* Rotas protegidas para Administradores */}
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-            <Route path="/admin/*" element={<div>Área do Administrador</div>} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/*" element={<Admin />} />
           </Route>
           
           {/* Rotas protegidas para Funcionários */}
