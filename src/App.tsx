@@ -13,20 +13,42 @@ import Admin from './pages/Admin';
 import Home from './pages/Home';
 import VirtualListDemo from './pages/VirtualListDemo';
 import Dashboard from './pages/Dashboard';
+import ExemploOffline from './pages/ExemploOffline';
 
 // Componentes
 import { ProtectedRoute } from './components/ProtectedRoute';
+import OfflineIndicator from './components/OfflineIndicator';
+import UpdatePrompt from './components/UpdatePrompt';
+
+// Registrar o service worker (apenas na produção)
+const registerServiceWorker = () => {
+  if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // O plugin vite-plugin-pwa gerencia o registro do SW
+      console.log('Service Worker gerenciado pelo vite-plugin-pwa');
+    });
+  }
+};
+
+registerServiceWorker();
 
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={defaultTheme}>
       <BrowserRouter>
+        {/* Componente de indicação offline que aparece em todas as páginas quando necessário */}
+        <OfflineIndicator />
+        
+        {/* Componente que notifica sobre atualizações disponíveis */}
+        <UpdatePrompt />
+        
         <Routes>
           {/* Rotas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/acesso-negado" element={<AcessoNegado />} />
           <Route path="/" element={<Home />} />
           <Route path="/virtual-lists" element={<VirtualListDemo />} />
+          <Route path="/offline-exemplo" element={<ExemploOffline />} />
           
           {/* Rotas protegidas para qualquer usuário autenticado */}
           <Route element={<ProtectedRoute />}>
